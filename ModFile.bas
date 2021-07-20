@@ -60,11 +60,6 @@ Function 指定名のシート取得(SheetName$) As Worksheet
 End Function
 
 Function InputCSV(CSVPath$)
-'CSVファイルを読み込んで配列形式で返す 関数代替
-    InputCSV = CSV読込(CSVPath)
-
-End Function
-Function CSV読込(CSVPath$)
 'CSVファイルを読み込んで配列形式で返す
 '20210706作成
 
@@ -72,7 +67,7 @@ Function CSV読込(CSVPath$)
     Dim Dummy
     If Dir(CSVPath, vbDirectory) = "" Then
         Dummy = MsgBox(CSVPath & "のファイルは存在しません", vbOKOnly + vbCritical)
-        Exit Sub
+        Exit Function
     End If
     
     Dim intFree As Integer
@@ -108,7 +103,7 @@ Function CSV読込(CSVPath$)
         Next J
     Next I
         
-    CSV読込 = Output
+    InputCSV = Output
     
 End Function
 Function InputFromBook(BookFolderPath$, BookName$, SheetName$, StartCellAddress$, Optional EndCellAddress$)
@@ -175,14 +170,14 @@ Function InputFromBook(BookFolderPath$, BookName$, SheetName$, StartCellAddress$
     InputFromBook = Output
     
 End Function
-Sub ファイル選択テスト()
+Private Sub SelectFileTest()
 'SelectFileの実行サンプル
 '20210720
 
     Dim FolderPath$
     Dim strFileName$
     Dim strExtentions$
-    FolderPath = ActiveWorkbook.Path
+    FolderPath = "" 'ActiveWorkbook.Path
     strFileName = "" '"Excelブック"   '←←←←←←←←←←←←←←←←←←←←←←←
     strExtentions = "" '"*.xls; *.xlsx; *.xlsm" '←←←←←←←←←←←←←←←←←←←←←←←
     
@@ -195,7 +190,7 @@ Function SelectFile(Optional FolderPath$, Optional strFileName$ = "", Optional s
 '選択したファイルのフルパスを返す
 '20210720
 
-'FolderPath・・・最初に開くフォルダ 指定しない場合は開いているブックのパス
+'FolderPath・・・最初に開くフォルダ 指定しない場合はカレントフォルダパス
 'strFileName・・・選択するファイルの名前  例：Excelブック
 'strExtentions・・・選択するファイルの拡張子　例："*.xls; *.xlsx; *.xlsm"
 
@@ -203,7 +198,7 @@ Function SelectFile(Optional FolderPath$, Optional strFileName$ = "", Optional s
     Set FD = Application.FileDialog(msoFileDialogFilePicker)
     
     If FolderPath = "" Then
-        FolderPath = ActiveWorkbook.Path
+        FolderPath = CurDir 'カレントフォルダ
     End If
     
     Dim Output$
@@ -225,7 +220,7 @@ Function SelectFile(Optional FolderPath$, Optional strFileName$ = "", Optional s
     SelectFile = Output
     
 End Function
-Sub フォルダ選択テスト()
+Private Sub SelectFolderTest()
 'SelectFolderの実行サンプル
 '20210720
 
@@ -241,13 +236,13 @@ Function SelectFolder(Optional FolderPath$)
 '選択したフォルダのフルパスを返す
 '20210720
 
-'FolderPath・・・最初に開くフォルダ 指定しない場合は開いているブックのパス
+'FolderPath・・・最初に開くフォルダ 指定しない場合はカレントフォルダパス
 
     Dim FD As FileDialog
     Set FD = Application.FileDialog(msoFileDialogFolderPicker)
     
     If FolderPath = "" Then
-        FolderPath = ActiveWorkbook.Path
+        FolderPath = CurDir 'カレントフォルダ
     End If
     
     Dim Output$
@@ -314,5 +309,66 @@ Function GetRowCountTextFile(FilePath$)
     End With
     
     GetRowCountTextFile = Output
+    
+End Function
+Function GetCurrentFolder()
+'カレントフォルダのパスを取得
+'関数思い出し用
+'20210720
+
+    GetCurrentFolder = CurDir
+    
+End Function
+Sub SetCurrentFolder(FolderPath$)
+'指定フォルダパスをカレントフォルダを設定
+'フォルダパスがネットワークドライブ上のフォルダか自動的に判定して
+'ネットワークドライブ上のフォルダもカレントフォルダに設定できる
+'20210720
+
+    If Dir(FolderPath, vbDirectory) = "" Then
+        MsgBox ("「" & FolderPath & "」がありません" & vbLf & _
+                "終了します")
+        End
+    End If
+    
+    If Mid(FolderPath, 1, 2) = "\\" Then
+        'ネットワークドライブの場合
+        Call SetCurrentFolderNetworkDrive(FolderPath)
+    Else
+        
+        'カレントドライブが異なる場合は先に設定する必要がある
+        If Mid(FolderPath, 1, 1) <> Mid(CurDir, 1, 1) Then
+            ChDrive Mid(FolderPath, 1, 1)
+        End If
+        
+        'カレントフォルダ設定
+        ChDir FolderPath
+    End If
+    
+End Sub
+Sub SetCurrentFolderNetworkDrive(NetworkFolderPath$)
+'ネットワークドライブ上のフォルダパスをカレントフォルダに設定する
+'20210720
+
+    With CreateObject("WScript.Shell")
+        .CurrentDirectory = NetworkFolderPath
+    End With
+    
+End Sub
+Private Sub GetExtensionTest()
+    
+    Dim Dummy
+    Dummy = GetExtension(ActiveWorkbook.Path & "\" & ActiveWorkbook.Name)
+    
+End Sub
+Function GetExtension(FilePath$)
+'ファイルの拡張子を取得する
+'20210720
+
+    Dim Output$
+    With CreateObject("Scripting.FileSystemObject")
+        Output = .GetExtensionName(FilePath)
+    End With
+    GetExtension = Output
     
 End Function
