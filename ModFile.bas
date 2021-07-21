@@ -941,7 +941,7 @@ Sub OutputPDF(TargetSheet As Worksheet, Optional FolderPath$, Optional FileName$
     If MessageIruNaraTrue Then
         If MsgBox("「" & FileName & ".pdf" & "」" & vbLf & "を作成しました" & vbLf & _
             "出力先フォルダを起動しますか?", vbYesNo + vbQuestion) = vbYes Then
-            Shell "C:\Windows\explorer.exe " & OutputFolder, vbNormalFocus
+            Shell "C:\Windows\explorer.exe " & FolderPath, vbNormalFocus
         End If
     End If
     
