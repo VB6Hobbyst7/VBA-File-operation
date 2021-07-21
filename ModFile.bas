@@ -910,3 +910,40 @@ Function GetSubFolders(FolderPath$)
     GetSubFolders = Output
     
 End Function
+Sub OutputPDF(TargetSheet As Worksheet, Optional FolderPath$, Optional FileName$, _
+              Optional MessageIruNaraTrue As Boolean = True)
+'指定シートをPDF化する
+'20210721
+
+'TargetSheet・・・PDF化する対象のシート
+'FolderPath・・・出力先フォルダ 指定しない場合はブックと同じフォルダ
+'FileName・・・出力PDFのファイル名 指定しない場合はシートの名前
+
+    If FolderPath = "" Then
+        FolderPath = TargetSheet.Parent.Path
+    End If
+    
+    If FileName = "" Then
+        FileName = TargetSheet.Name
+    End If
+    
+    '出力先フォルダがない場合は作成する。
+    If Dir(FolderPath, vbDirectory) = "" Then
+        MkDir FolderPath
+    End If
+    
+    Dim OutputFileName$
+    
+    OutputFileName = FolderPath & "\" & FileName & ".pdf"
+
+    TargetSheet.ExportAsFixedFormat Type:=xlTypePDF, FileName:=OutputFileName
+    
+    If MessageIruNaraTrue Then
+        If MsgBox("「" & FileName & ".pdf" & "」" & vbLf & "を作成しました" & vbLf & _
+            "出力先フォルダを起動しますか?", vbYesNo + vbQuestion) = vbYes Then
+            Shell "C:\Windows\explorer.exe " & OutputFolder, vbNormalFocus
+        End If
+    End If
+    
+End Sub
+
