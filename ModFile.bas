@@ -864,7 +864,7 @@ Sub TestGetFolder()
     Call DPH(Dummy)
 
 End Sub
-Function GetFolder(FolderPath$)
+Function GetSubFolders(FolderPath$)
 'フォルダ内のサブフォルダのリストを取得する
 '20210721
 
@@ -902,6 +902,6 @@ Function GetFolder(FolderPath$)
        Output(K) = TmpSubFolder.Name
     Next
     
-    GetFolder = Output
+    GetSubFolders = Output
     
 End Function
