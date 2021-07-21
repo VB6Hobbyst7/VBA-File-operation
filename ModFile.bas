@@ -106,7 +106,7 @@ Function InputCSV(CSVPath$)
     InputCSV = Output
     
 End Function
-Function InputFromBook(BookFolderPath$, BookName$, SheetName$, StartCellAddress$, Optional EndCellAddress$)
+Function InputBook(BookFolderPath$, BookName$, SheetName$, StartCellAddress$, Optional EndCellAddress$)
 'ブックを開かないでデータを取得する
 'ExecuteExcel4Macroを使用するので、Excelのバージョンアップの時に注意
 '20210720
@@ -167,7 +167,7 @@ Function InputFromBook(BookFolderPath$, BookName$, SheetName$, StartCellAddress$
         Next I
     End If
     
-    InputFromBook = Output
+    InputBook = Output
     
 End Function
 Private Sub SelectFileTest()
@@ -489,6 +489,9 @@ Function InputText(FilePath$, Optional KugiriMoji$ = "")
 '文字コードは自動的に判定して読込形式を変更する
 '20210721
 
+'FilePath・・・テキストファイルのフルパス
+'KugiriMoji・・・テキストファイルを読み込んで区切り文字で区切って配列で出力する場合の区切り文字
+
     'テキストファイルの存在確認
     If Dir(FilePath, vbDirectory) = "" Then
         MsgBox ("「" & FilePath & "」" & vbLf & _
@@ -528,6 +531,11 @@ Function InputText(FilePath$, Optional KugiriMoji$ = "")
     
 End Function
 Function InputTextShiftJIS(FilePath$, Optional KugiriMoji$ = "")
+'テキストファイルを読み込む ShiftJIS形式専用
+'20210721
+
+'FilePath・・・テキストファイルのフルパス
+'KugiriMoji・・・テキストファイルを読み込んで区切り文字で区切って配列で出力する場合の区切り文字
     
     Dim I&, J&, K&, M&, N& '数え上げ用(Long型)
     Dim FileNo%, Buffer$, SplitBuffer
@@ -575,7 +583,12 @@ Function InputTextShiftJIS(FilePath$, Optional KugiriMoji$ = "")
 
 End Function
 Function InputTextUTF8(FilePath$, Optional KugiriMoji$ = "")
-    
+'テキストファイルを読み込む UTF8形式専用
+'20210721
+
+'FilePath・・・テキストファイルのフルパス
+'KugiriMoji・・・テキストファイルを読み込んで区切り文字で区切って配列で出力する場合の区切り文字
+
     Dim I&, J&, K&, M&, N& '数え上げ用(Long型)
     Dim Buffer$, SplitBuffer
     Dim Output1, Output2
@@ -762,5 +775,133 @@ Function fncGetCharset(FileName As String) As String
     fncGetCharset = ""
     
 End Function
+Sub TestGetFiles()
+    
+    Dim FolderPath$
+    FolderPath = ActiveWorkbook.Path
+    
+    Dim Dummy
+    Dummy = GetFiles(FolderPath, "xlsm", "lnk")
+    
+    Call DPH(Dummy)
+    
+End Sub
+Function GetFiles(FolderPath$, ParamArray Extensions())
+'フォルダ内のファイルのリストを取得する
+'20210721
 
+'FolderPath・・・検索対象のフォルダパス
+'Extensions・・・取得対象の拡張子、可変長引数配列で入力可能
 
+    'フォルダの確認
+    If Dir(FolderPath, vbDirectory) = "" Then
+        MsgBox ("「" & FolderPath & "」" & vbLf & _
+               "のフォルダの存在が確認できません。" & vbLf & _
+               "処理を終了します。")
+    End If
+    
+    '拡張子の連想配列を作成
+    Dim ExtensionDict As Object, TmpExtension
+    
+    If IsMissing(Extensions) <> True Then
+        '拡張子が入力されている場合
+        Set ExtensionDict = CreateObject("Scripting.Dictionary")
+        For Each TmpExtension In Extensions
+            TmpExtension = StrConv(TmpExtension, vbLowerCase)
+            ExtensionDict.Add TmpExtension, ""
+        Next
+    End If
+    
+    Dim FSO As New FileSystemObject
+    Dim myFolder As Folder
+    Dim myFiles As Files
+    Dim TmpFile As File, TmpFileName$
+    Set myFolder = FSO.GetFolder(FolderPath)
+    Set myFiles = myFolder.Files
+    
+    If myFiles.Count = 0 Then
+        'ファイル無し
+        Exit Function
+    End If
+    
+    Dim I%, J%, K%, M%, N% '数え上げ用(Integer型)
+    Dim Output
+    ReDim Output(1 To 1)
+    
+    If IsMissing(Extensions) = True Then
+        N = myFiles.Count
+        ReDim Output(1 To N)
+    End If
+    
+    K = 0
+    For Each TmpFile In myFiles
+        TmpFileName = TmpFile.Name
+        
+        If IsMissing(Extensions) <> True Then
+            TmpExtension = StrConv(FSO.GetExtensionName(FolderPath & "\" & TmpFileName), vbLowerCase)
+            If ExtensionDict.Exists(TmpExtension) Then
+                K = K + 1
+                ReDim Preserve Output(1 To K)
+                Output(K) = TmpFileName
+            End If
+        Else
+            K = K + 1
+            Output(K) = TmpFileName
+        End If
+    Next
+    
+    GetFiles = Output
+    
+End Function
+Sub TestGetFolder()
+    
+    Dim FolderPath$
+    FolderPath = ActiveWorkbook.Path
+    
+    Dim Dummy
+    Dummy = GetFolder(FolderPath)
+    
+    Call DPH(Dummy)
+
+End Sub
+Function GetFolder(FolderPath$)
+'フォルダ内のサブフォルダのリストを取得する
+'20210721
+
+'FolderPath・・・検索対象のフォルダパス
+
+    'フォルダの確認
+    If Dir(FolderPath, vbDirectory) = "" Then
+        MsgBox ("「" & FolderPath & "」" & vbLf & _
+               "のフォルダの存在が確認できません。" & vbLf & _
+               "処理を終了します。")
+    End If
+    
+    '拡張子の連想配列を作成
+    Dim ExtensionDict As Object, TmpExtension
+    
+    Dim FSO As New FileSystemObject
+    Dim myFolder As Folder
+    Dim mySubFolder As Folders, TmpSubFolder As Folder
+    Set myFolder = FSO.GetFolder(FolderPath)
+    Set mySubFolder = myFolder.SubFolders
+    
+    Dim I%, J%, K%, M%, N% '数え上げ用(Integer型)
+    Dim Output
+    N = mySubFolder.Count
+    
+    If N = 0 Then
+        'サブフォルダ無し
+        Exit Function
+    End If
+    ReDim Output(1 To N)
+    
+    K = 0
+    For Each TmpSubFolder In mySubFolder
+       K = K + 1
+       Output(K) = TmpSubFolder.Name
+    Next
+    
+    GetFolder = Output
+    
+End Function
