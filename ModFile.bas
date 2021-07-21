@@ -437,7 +437,7 @@ Sub OutputText(FolderPath$, FileName$, ByVal OutputHairetu, Optional KugiriMoji$
 '20210721
    
 'FolderPath・・・出力先のフォルダパス
-'FileName・・・出力するファイル名（拡張子は付けない）
+'FileName・・・出力するファイル名（拡張子はつける）
 'OutputHairetu・・・出力する配列
 'KugiriMoji・・・文字列間の区切り文字
 
@@ -453,7 +453,7 @@ Sub OutputText(FolderPath$, FileName$, ByVal OutputHairetu, Optional KugiriMoji$
     ' FreeFile値の取得(以降この値で入出力する)
     fp = FreeFile
     ' 指定ファイルをOPEN(出力モード)
-    Open FolderPath & "\" & FileName & ".txt" For Output As #fp
+    Open FolderPath & "\" & FileName For Output As #fp
     ' 最終行まで繰り返す
     
     For I = 1 To N
@@ -461,7 +461,12 @@ Sub OutputText(FolderPath$, FileName$, ByVal OutputHairetu, Optional KugiriMoji$
             ' レコードを出力
             Print #fp, OutputHairetu(I, J) & KugiriMoji;
         Next J
-        Print #fp, OutputHairetu(I, M)
+        
+        If I < N Then
+            Print #fp, OutputHairetu(I, M)
+        Else
+            Print #fp, OutputHairetu(I, M);
+        End If
     Next I
     ' 指定ファイルをCLOSE
     Close fp
