@@ -372,11 +372,28 @@ Function GetExtension(FilePath$)
     GetExtension = Output
     
 End Function
-Sub OpenFolder(FilePath$)
+Sub OpenFolder(FolderPath$)
 '指定パスのフォルダを起動する。
 '20210721
     
-    Shell "C:\Windows\explorer.exe " & FilePath, vbNormalFocus
+    Shell "C:\Windows\explorer.exe " & FolderPath, vbNormalFocus
+
+End Sub
+Sub OpenFile(FilePath$)
+'指定パスのファイルを起動する。
+'20210726
+    
+    Dim WSH As Object
+    SAE WSH = CreateObject("WScript.Shell")
+    WSH.Run FilePath
+    
+End Sub
+Sub OpenApplication(ApplicationPath$)
+'指定パスのアプリを起動する
+'例)電卓なら"calc.exe"など
+'20210726
+    
+    Shell ApplicationPath, vbNormalFocus
 
 End Sub
 Sub TestOutputCSV()
