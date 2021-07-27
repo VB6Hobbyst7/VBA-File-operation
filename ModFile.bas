@@ -963,4 +963,76 @@ Sub OutputPDF(TargetSheet As Worksheet, Optional FolderPath$, Optional FileName$
     End If
     
 End Sub
+Sub TestOutputXML()
+    
+    Dim Title$, TableList, InputList, FolderPath$, FileName$
+    Title = "TestXML"
+    TableList = Range("B2:F2").Value '←←←←←←←←←←←←←←←←←←←←←←←
+    TableList = Application.Transpose(TableList)
+    TableList = Application.Transpose(TableList)
+    InputList = Range("B3:F5").Value '←←←←←←←←←←←←←←←←←←←←←←←
+    FolderPath = ActiveWorkbook.Path
+    FileName = Title
+    
+    Call OutputXML(Title, TableList, InputList, FolderPath, FileName)
+    
+    
+End Sub
+Sub OutputXML(Title$, TableList, InputList, FolderPath$, FileName$)
+'テーブルデータからXMLデータを出力する
+'20210727
 
+    '引数のチェック
+    Dim I&, J&, K&, M&, N& '数え上げ用(Long型)
+    Dim Dummy&
+    M = UBound(TableList, 1)
+    On Error Resume Next
+    Dummy = UBound(TableList, 2)
+    On Error GoTo 0
+    If Dummy <> 0 Then
+        MsgBox ("項目リスト「TableList」は1次元配列で入力してください")
+        Stop
+        End
+    End If
+    
+    On Error Resume Next
+    Dummy = 0
+    Dummy = UBound(InputList, 2)
+    On Error GoTo 0
+    If Dummy = 0 Then
+        MsgBox ("値リスト「InputList」は2次元配列で入力してください")
+        Stop
+        End
+    End If
+    
+    If UBound(TableList, 1) <> UBound(InputList, 2) Then
+        MsgBox ("項目リスト「TableList」の要素数と" & vbLf & _
+                "値リスト「InputList」の2次元要素数を一致させてください")
+        Stop
+        End
+    End If
+    
+    N = UBound(InputList, 1)
+    
+    Dim XMLDoc As Object, Node As Object
+    Dim RootNode As Object, TmpNode As Object
+    Set XMLDoc = CreateObject("XSXML2.DOMDocument")
+    With XMLDoc
+        Set Node = .CreateProcessingInstruction("xml", "version=""1.0""encoding=""UTF-8""")
+        .AppendChild Node
+        Set RootNode = .CreateElement(Title)
+        For I = 1 To N
+            Set Node = .CreateElement("番号")
+            Node.SetAttribute "id", I
+            For J = 1 To M
+                Set TmpNode = .CreateElemnt(TableList(J))
+                TmpNode.AppendChild .CreateTextNode(InputList(I, J))
+                Node.AppendChild TmpNode
+            Next J
+            RootNode.AppendChild Node
+        Next I
+        .AppendChild RootNode
+        .Save FolderPath & "\" & FileName & ".xml"
+    End With
+
+End Sub
