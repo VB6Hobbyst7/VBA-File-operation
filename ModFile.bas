@@ -17,7 +17,6 @@ Sub シートを別ブックで保存(TargetSheet As Worksheet, Optional SaveName$, Optiona
     If SaveName = "" Then
         SaveName = TargetSheet.Name
     End If
-    
     If SavePath = "" Then
         SavePath = TargetSheet.Parent.Path
     End If
@@ -967,10 +966,15 @@ Sub TestOutputXML()
     
     Dim Title$, TableList, InputList, FolderPath$, FileName$
     Title = "TestXML"
-    TableList = Range("B2:F2").Value '←←←←←←←←←←←←←←←←←←←←←←←
+    TableList = Split("A,B,C,D,E", ",")
     TableList = Application.Transpose(TableList)
     TableList = Application.Transpose(TableList)
-    InputList = Range("B3:F5").Value '←←←←←←←←←←←←←←←←←←←←←←←
+    InputList = Array(Split("あ,い,う,え,お", ","), _
+                      Split("い,ろ,は,に,ほ", ","), _
+                      Split("α,β,γ,δ,ε", ","))
+    InputList = Application.Transpose(InputList)
+    InputList = Application.Transpose(InputList)
+                      
     FolderPath = ActiveWorkbook.Path
     FileName = Title
     
@@ -980,7 +984,15 @@ Sub TestOutputXML()
 End Sub
 Sub OutputXML(Title$, TableList, InputList, FolderPath$, FileName$)
 'テーブルデータからXMLデータを出力する
+'「Microsoft XML, v6.0」ライブラリを参照すること
+'参考：http://www.openreference.org/articles/view/651
 '20210727
+
+'Title      :タイトル
+'TableList  :項目リスト
+'InputList  :XMLデータ内のデータ
+'FolderPath :XMLデータの出力する先のフォルダパス
+'FileName   :XMLデータを出力するファイル名（拡張子"xml"は含まず）
 
     '引数のチェック
     Dim I&, J&, K&, M&, N& '数え上げ用(Long型)
@@ -1014,25 +1026,39 @@ Sub OutputXML(Title$, TableList, InputList, FolderPath$, FileName$)
     
     N = UBound(InputList, 1)
     
-    Dim XMLDoc As Object, Node As Object
-    Dim RootNode As Object, TmpNode As Object
-    Set XMLDoc = CreateObject("XSXML2.DOMDocument")
+    
+    Dim XMLDoc As New MSXML2.DOMDocument60
+    Dim xmlRoot As IXMLDOMNode
+    Dim xmlData As IXMLDOMNode
+    Dim xmlChildData As IXMLDOMNode
+    Dim xmlAttr As MSXML2.IXMLDOMAttribute
+
     With XMLDoc
-        Set Node = .CreateProcessingInstruction("xml", "version=""1.0""encoding=""UTF-8""")
-        .AppendChild Node
-        Set RootNode = .CreateElement(Title)
+        'XML宣言を生成
+        Call .appendChild(.createProcessingInstruction("xml", "version=""1.0"" encoding=""Shift_JIS"""))
+        
+        '要素を生成
+        Set xmlRoot = .appendChild(.createElement(Title))
+        
         For I = 1 To N
-            Set Node = .CreateElement("番号")
-            Node.SetAttribute "id", I
+            
+            '要素を生成
+            Set xmlData = .createElement("DATA")           '要素を生成
+            Set xmlAttr = .createAttribute("id")          'id属性を生成
+            xmlAttr.NodeValue = I                         'id属性の値を設定
+            Call xmlData.Attributes.setNamedItem(xmlAttr) '要素にid属性を設定
+            
+            '要素の子要素を生成して要素に追加
             For J = 1 To M
-                Set TmpNode = .CreateElemnt(TableList(J))
-                TmpNode.AppendChild .CreateTextNode(InputList(I, J))
-                Node.AppendChild TmpNode
+                Set xmlChildData = xmlData.appendChild(.createElement(TableList(J)))
+                xmlChildData.Text = InputList(I, J)
             Next J
-            RootNode.AppendChild Node
+            
+            Call xmlRoot.appendChild(xmlData)
         Next I
-        .AppendChild RootNode
-        .Save FolderPath & "\" & FileName & ".xml"
+        
+        'XMLドキュメントを出力
+        .Save (FolderPath & "\" & FileName & ".xml")
     End With
 
 End Sub
