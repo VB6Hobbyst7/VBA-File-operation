@@ -8,6 +8,7 @@ Sub SaveSheetAsBook(TargetSheet As Worksheet, Optional SaveName$, Optional SaveP
     Call シートを別ブックで保存(TargetSheet, SaveName, SavePath, MessageIruNaraTrue)
                            
 End Sub
+
 Sub シートを別ブックで保存(TargetSheet As Worksheet, Optional SaveName$, Optional SavePath$, _
                            Optional MessageIruNaraTrue As Boolean = False)
 '指定のシートを別ブックで保存する
@@ -40,6 +41,7 @@ Function GetSheetByName(SheetName&) As Worksheet
     Set GetSheetByName = 指定名のシート取得(SheetName)
 
 End Function
+
 Function 指定名のシート取得(SheetName$) As Worksheet
 '指定の名前のシートをワークシートオブジェクトとして取得する
 '20210715作成
@@ -105,6 +107,7 @@ Function InputCSV(CSVPath$)
     InputCSV = Output
     
 End Function
+
 Function InputBook(BookFolderPath$, BookName$, SheetName$, StartCellAddress$, Optional EndCellAddress$)
 'ブックを開かないでデータを取得する
 'ExecuteExcel4Macroを使用するので、Excelのバージョンアップの時に注意
@@ -169,6 +172,7 @@ Function InputBook(BookFolderPath$, BookName$, SheetName$, StartCellAddress$, Op
     InputBook = Output
     
 End Function
+
 Private Sub SelectFileTest()
 'SelectFileの実行サンプル
 '20210720
@@ -184,6 +188,7 @@ Private Sub SelectFileTest()
     FilePath = SelectFile(FolderPath, strFileName, strExtentions)
     
 End Sub
+
 Function SelectFile(Optional FolderPath$, Optional strFileName$ = "", Optional strExtentions$ = "")
 'ファイルを選択するダイアログを表示してファイルを選択させる
 '選択したファイルのフルパスを返す
@@ -219,6 +224,7 @@ Function SelectFile(Optional FolderPath$, Optional strFileName$ = "", Optional s
     SelectFile = Output
     
 End Function
+
 Private Sub SelectFolderTest()
 'SelectFolderの実行サンプル
 '20210720
@@ -230,6 +236,7 @@ Private Sub SelectFolderTest()
     FilePath = SelectFolder(FolderPath)
     
 End Sub
+
 Function SelectFolder(Optional FolderPath$)
 'フォルダを選択するダイアログを表示してファイルを選択させる
 '選択したフォルダのフルパスを返す
@@ -262,6 +269,7 @@ Function SelectFolder(Optional FolderPath$)
     SelectFolder = Output
     
 End Function
+
 Function GetFileDateTime(FilePath$)
 'ファイルのタイムスタンプを取得する。
 '関数思い出し用
@@ -272,6 +280,7 @@ Function GetFileDateTime(FilePath$)
     GetFileDateTime = FileDateTime(FilePath)
     
 End Function
+
 Sub MakeFolder(FolderPath$)
 'フォルダを作成する
 '20210720
@@ -282,6 +291,7 @@ Sub MakeFolder(FolderPath$)
         MkDir FolderPath
     End If
 End Sub
+
 Sub GetRowCountTextFileTest()
     
     Dim FilePath$
@@ -291,6 +301,7 @@ Sub GetRowCountTextFileTest()
     RowCount = GetRowCountTextFile(FilePath)
     
 End Sub
+
 Function GetRowCountTextFile(FilePath$)
 'テキストファイル、CSVファイルの行数を取得する
 '20210720
@@ -310,6 +321,7 @@ Function GetRowCountTextFile(FilePath$)
     GetRowCountTextFile = Output
     
 End Function
+
 Function GetCurrentFolder()
 'カレントフォルダのパスを取得
 '関数思い出し用
@@ -318,6 +330,7 @@ Function GetCurrentFolder()
     GetCurrentFolder = CurDir
     
 End Function
+
 Sub SetCurrentFolder(FolderPath$)
 '指定フォルダパスをカレントフォルダを設定
 'フォルダパスがネットワークドライブ上のフォルダか自動的に判定して
@@ -345,6 +358,7 @@ Sub SetCurrentFolder(FolderPath$)
     End If
     
 End Sub
+
 Sub SetCurrentFolderNetworkDrive(NetworkFolderPath$)
 'ネットワークドライブ上のフォルダパスをカレントフォルダに設定する
 '20210720
@@ -354,12 +368,14 @@ Sub SetCurrentFolderNetworkDrive(NetworkFolderPath$)
     End With
     
 End Sub
+
 Private Sub GetExtensionTest()
     
     Dim Dummy
     Dummy = GetExtension(ActiveWorkbook.Path & "\" & ActiveWorkbook.Name)
     
 End Sub
+
 Function GetExtension(FilePath$)
 'ファイルの拡張子を取得する
 '20210720
@@ -371,6 +387,7 @@ Function GetExtension(FilePath$)
     GetExtension = Output
     
 End Function
+
 Sub OpenFolder(FolderPath$)
 '指定パスのフォルダを起動する。
 '20210721
@@ -378,6 +395,7 @@ Sub OpenFolder(FolderPath$)
     Shell "C:\Windows\explorer.exe " & FolderPath, vbNormalFocus
 
 End Sub
+
 Sub OpenFile(FilePath$)
 '指定パスのファイルを起動する。
 '20210726
@@ -387,6 +405,7 @@ Sub OpenFile(FilePath$)
     WSH.Run FilePath
     
 End Sub
+
 Sub OpenApplication(ApplicationPath$)
 '指定パスのアプリを起動する
 '例)電卓なら"calc.exe"など
@@ -395,6 +414,7 @@ Sub OpenApplication(ApplicationPath$)
     Shell ApplicationPath, vbNormalFocus
 
 End Sub
+
 Sub TestOutputCSV()
 
     Dim FolderPath$, FileName$, OutputHairetu
@@ -404,6 +424,7 @@ Sub TestOutputCSV()
     Call OutputCSV(FolderPath, FileName, OutputHairetu)
 
 End Sub
+
 Sub OutputCSV(FolderPath$, FileName$, ByVal OutputHairetu)
 '指定配列をCSVで出力する
 '20210721
@@ -439,6 +460,7 @@ Sub OutputCSV(FolderPath$, FileName$, ByVal OutputHairetu)
     Close fp
 
 End Sub
+
 Sub TestOutputText()
 
     Dim FolderPath$, FileName$, OutputHairetu
@@ -448,6 +470,7 @@ Sub TestOutputText()
     Call OutputText(FolderPath, FileName, OutputHairetu, Chr(9))
 
 End Sub
+
 Sub OutputText(FolderPath$, FileName$, ByVal OutputHairetu, Optional KugiriMoji$ = ",")
 '指定配列をtxtで出力する
 '20210721
@@ -488,6 +511,7 @@ Sub OutputText(FolderPath$, FileName$, ByVal OutputHairetu, Optional KugiriMoji$
     Close fp
 
 End Sub
+
 Sub TestInputText()
     Dim FilePath$, KugiriMoji$
     FilePath = ActiveWorkbook.Path & "\" & "仏説摩訶般若波羅蜜多心経ShiftJIS.txt"
@@ -505,6 +529,7 @@ Sub TestInputText()
     Call DPH(Dummy)
     
 End Sub
+
 Function InputText(FilePath$, Optional KugiriMoji$ = "")
 'テキストファイルを読み込んで配列で返す
 '文字コードは自動的に判定して読込形式を変更する
@@ -551,6 +576,7 @@ Function InputText(FilePath$, Optional KugiriMoji$ = "")
     InputText = Output
     
 End Function
+
 Function InputTextShiftJIS(FilePath$, Optional KugiriMoji$ = "")
 'テキストファイルを読み込む ShiftJIS形式専用
 '20210721
@@ -603,6 +629,7 @@ Function InputTextShiftJIS(FilePath$, Optional KugiriMoji$ = "")
     InputTextShiftJIS = Output2
 
 End Function
+
 Function InputTextUTF8(FilePath$, Optional KugiriMoji$ = "")
 'テキストファイルを読み込む UTF8形式専用
 '20210721
@@ -796,6 +823,7 @@ Function fncGetCharset(FileName As String) As String
     fncGetCharset = ""
     
 End Function
+
 Sub TestGetFiles()
     
     Dim FolderPath$
@@ -807,6 +835,7 @@ Sub TestGetFiles()
     Call DPH(Dummy)
     
 End Sub
+
 Function GetFiles(FolderPath$, ParamArray Extensions())
 'フォルダ内のファイルのリストを取得する
 '20210721
@@ -874,6 +903,7 @@ Function GetFiles(FolderPath$, ParamArray Extensions())
     GetFiles = Output
     
 End Function
+
 Sub TestGetFolder()
     
     Dim FolderPath$
@@ -885,6 +915,7 @@ Sub TestGetFolder()
     Call DPH(Dummy)
 
 End Sub
+
 Function GetSubFolders(FolderPath$)
 'フォルダ内のサブフォルダのリストを取得する
 '20210721
@@ -926,6 +957,7 @@ Function GetSubFolders(FolderPath$)
     GetSubFolders = Output
     
 End Function
+
 Sub OutputPDF(TargetSheet As Worksheet, Optional FolderPath$, Optional FileName$, _
               Optional MessageIruNaraTrue As Boolean = True)
 '指定シートをPDF化する
@@ -962,6 +994,7 @@ Sub OutputPDF(TargetSheet As Worksheet, Optional FolderPath$, Optional FileName$
     End If
     
 End Sub
+
 Sub TestOutputXML()
     
     Dim Title$, TableList, InputList, FolderPath$, FileName$
@@ -974,6 +1007,8 @@ Sub TestOutputXML()
                       Split("α,β,γ,δ,ε", ","))
     InputList = Application.Transpose(InputList)
     InputList = Application.Transpose(InputList)
+    
+    InputList(1, 3) = "ああああ" & vbLf & "AAAAA"
                       
     FolderPath = ActiveWorkbook.Path
     FileName = Title
@@ -982,6 +1017,7 @@ Sub TestOutputXML()
     
     
 End Sub
+
 Sub OutputXML(Title$, TableList, InputList, FolderPath$, FileName$)
 'テーブルデータからXMLデータを出力する
 '「Microsoft XML, v6.0」ライブラリを参照すること
