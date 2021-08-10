@@ -35,14 +35,7 @@ Sub シートを別ブックで保存(TargetSheet As Worksheet, Optional SaveName$, Optiona
     
 End Sub
 
-Function GetSheetByName(SheetName&) As Worksheet
-'指定の名前のシートをワークシートオブジェクトとして取得する 関数代替
-
-    Set GetSheetByName = 指定名のシート取得(SheetName)
-
-End Function
-
-Function 指定名のシート取得(SheetName$) As Worksheet
+Function GetSheetByName(SheetName$) As Worksheet
 '指定の名前のシートをワークシートオブジェクトとして取得する
 '20210715作成
 
@@ -56,7 +49,7 @@ Function 指定名のシート取得(SheetName$) As Worksheet
         End
     End If
     
-    Set 指定名のシート取得 = Output
+    Set GetSheetByName = Output
 
 End Function
 
@@ -173,7 +166,7 @@ Function InputBook(BookFolderPath$, BookName$, SheetName$, StartCellAddress$, Op
     
 End Function
 
-Private Sub SelectFileTest()
+Private Sub TestSelectFile()
 'SelectFileの実行サンプル
 '20210720
 
@@ -225,7 +218,7 @@ Function SelectFile(Optional FolderPath$, Optional strFileName$ = "", Optional s
     
 End Function
 
-Private Sub SelectFolderTest()
+Private Sub TestSelectFolder()
 'SelectFolderの実行サンプル
 '20210720
 
@@ -292,7 +285,7 @@ Sub MakeFolder(FolderPath$)
     End If
 End Sub
 
-Sub GetRowCountTextFileTest()
+Sub TestGetRowCountTextFile()
     
     Dim FilePath$
     FilePath = ActiveWorkbook.Path & "\" & "TestText.txt"
@@ -369,7 +362,7 @@ Sub SetCurrentFolderNetworkDrive(NetworkFolderPath$)
     
 End Sub
 
-Private Sub GetExtensionTest()
+Private Sub TestGetExtension()
     
     Dim Dummy
     Dummy = GetExtension(ActiveWorkbook.Path & "\" & ActiveWorkbook.Name)
@@ -832,7 +825,7 @@ Sub TestGetFiles()
     Dim Dummy
     Dummy = GetFiles(FolderPath, "xlsm", "lnk")
     
-    Call DPH(Dummy)
+'    Call DPH(Dummy)
     
 End Sub
 
