@@ -25,9 +25,11 @@
 ### 設定2（参照ライブラリ）
 
 - Microsoft Scripting Runtime
-	プロシージャ「GetFiles」にてFileSystemObjectを使用するため
+	(プロシージャ「GetFiles」にてFileSystemObjectを使用するため)
 - Microsoft XML, v6.0
-	プロシージャ「OutputXML」にて必要
+	(プロシージャ「OutputXML」にて必要)
+
+![参照ライブラリ](https://user-images.githubusercontent.com/73621859/130559137-a6d77469-254a-479e-adbc-11db57abf530.jpg)
 
 ## 現在「ModFile.bas」にて使用できるプロシージャ一覧
 - SaveSheetAsBook	…シートをブックで保存
