@@ -14,9 +14,15 @@
 
 # 使い方
 
+##「実行サンプル ファイル操作.xlsm」の使い方
+「実行サンプル ファイル操作.xlsm」には「ModFile.bas」内のプロシージャの実行サンプルプロシージャのボタンが登録してある。
+
+各ボタンを押して使用を確かめていただきたし
+![実行サンプル中身](https://user-images.githubusercontent.com/73621859/130559394-224153a9-7241-40d1-b9e6-0ad47ad15000.jpg)
+
+
 ## 設定
 実行サンプル「実行サンプル ファイル操作.xlsm」の中の設定は以下の通り。
-
 
 ### 設定1（使用モジュール）
 
@@ -32,6 +38,7 @@
 ![参照ライブラリ](https://user-images.githubusercontent.com/73621859/130559137-a6d77469-254a-479e-adbc-11db57abf530.jpg)
 
 ## 現在「ModFile.bas」にて使用できるプロシージャ一覧
+
 - SaveSheetAsBook	…シートをブックで保存
 - GetSheetByName	…シート名指定でシートオブジェクト取得
 - InputCSV		…CSVファイル読込	
