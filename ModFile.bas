@@ -2,15 +2,6 @@ Attribute VB_Name = "ModFile"
 Option Explicit
 Sub SaveSheetAsBook(TargetSheet As Worksheet, Optional SaveName$, Optional SavePath$, _
                            Optional MessageIruNaraTrue As Boolean = False)
-'指定のシートを別ブックで保存する 関数名代替
-'20210719作成
-                           
-    Call シートを別ブックで保存(TargetSheet, SaveName, SavePath, MessageIruNaraTrue)
-                           
-End Sub
-
-Sub シートを別ブックで保存(TargetSheet As Worksheet, Optional SaveName$, Optional SavePath$, _
-                           Optional MessageIruNaraTrue As Boolean = False)
 '指定のシートを別ブックで保存する
 '20210719作成
                            
@@ -394,7 +385,7 @@ Sub OpenFile(FilePath$)
 '20210726
     
     Dim WSH As Object
-    SAE WSH = CreateObject("WScript.Shell")
+    Set WSH = CreateObject("WScript.Shell")
     WSH.Run FilePath
     
 End Sub
@@ -503,24 +494,6 @@ Sub OutputText(FolderPath$, FileName$, ByVal OutputHairetu, Optional KugiriMoji$
     ' 指定ファイルをCLOSE
     Close fp
 
-End Sub
-
-Sub TestInputText()
-    Dim FilePath$, KugiriMoji$
-    FilePath = ActiveWorkbook.Path & "\" & "仏説摩訶般若波羅蜜多心経ShiftJIS.txt"
-    KugiriMoji = " "
-    
-    Dim Dummy
-    Dummy = InputText(FilePath, KugiriMoji)
-    
-    Call DPH(Dummy, 5)
-    
-    FilePath = ActiveWorkbook.Path & "\" & "仏説摩訶般若波羅蜜多心経UTF8.txt"
-    KugiriMoji = " "
-    Dummy = InputText(FilePath, KugiriMoji)
-    
-    Call DPH(Dummy)
-    
 End Sub
 
 Function InputText(FilePath$, Optional KugiriMoji$ = "")
@@ -817,21 +790,11 @@ Function fncGetCharset(FileName As String) As String
     
 End Function
 
-Sub TestGetFiles()
-    
-    Dim FolderPath$
-    FolderPath = ActiveWorkbook.Path
-    
-    Dim Dummy
-    Dummy = GetFiles(FolderPath, "xlsm", "lnk")
-    
-'    Call DPH(Dummy)
-    
-End Sub
-
 Function GetFiles(FolderPath$, ParamArray Extensions())
 'フォルダ内のファイルのリストを取得する
 '20210721
+
+'「Microsoft Scripting Runtime」ライブラリを参照すること
 
 'FolderPath・・・検索対象のフォルダパス
 'Extensions・・・取得対象の拡張子、可変長引数配列で入力可能
@@ -896,18 +859,6 @@ Function GetFiles(FolderPath$, ParamArray Extensions())
     GetFiles = Output
     
 End Function
-
-Sub TestGetFolder()
-    
-    Dim FolderPath$
-    FolderPath = ActiveWorkbook.Path
-    
-    Dim Dummy
-    Dummy = GetFolder(FolderPath)
-    
-    Call DPH(Dummy)
-
-End Sub
 
 Function GetSubFolders(FolderPath$)
 'フォルダ内のサブフォルダのリストを取得する
@@ -988,73 +939,59 @@ Sub OutputPDF(TargetSheet As Worksheet, Optional FolderPath$, Optional FileName$
     
 End Sub
 
-Sub TestOutputXML()
-    
-    Dim Title$, TableList, InputList, FolderPath$, FileName$
-    Title = "TestXML"
-    TableList = Split("A,B,C,D,E", ",")
-    TableList = Application.Transpose(TableList)
-    TableList = Application.Transpose(TableList)
-    InputList = Array(Split("あ,い,う,え,お", ","), _
-                      Split("い,ろ,は,に,ほ", ","), _
-                      Split("α,β,γ,δ,ε", ","))
-    InputList = Application.Transpose(InputList)
-    InputList = Application.Transpose(InputList)
-    
-    InputList(1, 3) = "ああああ" & vbLf & "AAAAA"
-                      
-    FolderPath = ActiveWorkbook.Path
-    FileName = Title
-    
-    Call OutputXML(Title, TableList, InputList, FolderPath, FileName)
-    
-    
-End Sub
-
-Sub OutputXML(Title$, TableList, InputList, FolderPath$, FileName$)
+Sub OutputXML(Title$, InputList, TateTableList, YokoTableList, _
+              Optional TateTableName$ = "DATA", Optional YokoTableName$ = "ID", _
+              Optional FolderPath$, Optional FileName$)
+              
 'テーブルデータからXMLデータを出力する
 '「Microsoft XML, v6.0」ライブラリを参照すること
 '参考：http://www.openreference.org/articles/view/651
 '20210727
+'20210824改良
 
-'Title      :タイトル
-'TableList  :項目リスト
-'InputList  :XMLデータ内のデータ
-'FolderPath :XMLデータの出力する先のフォルダパス
-'FileName   :XMLデータを出力するファイル名（拡張子"xml"は含まず）
+'Title          :タイトル
+'InputList      :XMLデータ内のデータリスト（2次元配列）
+'TateTableList  :縦方向のテーブル名のリスト（1次元配列）
+'YokoTableList  :横方向のテーブル名のリスト（1次元配列）
+'TateTableName  :縦方向のテーブル名。デフォルトは"DATA"
+'YokoTableName  :横方向のテーブル名。デフォルトは"ID"
+'FolderPath     :XMLデータの出力する先のフォルダパス。デフォルトは自Excelブックのパス
+'FileName       :XMLデータを出力するファイル名（拡張子"xml"は含まず）　デフォルトはタイトル(Title)と同じ
 
     '引数のチェック
+    Call CheckArray1D(TateTableList, "TateTableList")
+    Call CheckArray1D(YokoTableList, "YokoTableList")
+    Call CheckArray2D(InputList, "InputList")
+    Call CheckArray1DStart1(TateTableList, "TateTableList")
+    Call CheckArray1DStart1(YokoTableList, "YokoTableList")
+    Call CheckArray2DStart1(InputList, "InputList")
+    
+    If UBound(TateTableList, 1) <> UBound(InputList, 1) Then
+        MsgBox ("「TateTableList」の要素数と" & vbLf & _
+                "「InputList」の縦要素数を一致させてください")
+        Stop
+        End
+    End If
+    
+    If UBound(YokoTableList, 1) <> UBound(InputList, 2) Then
+        MsgBox ("「YokoTableList」の要素数と" & vbLf & _
+                "「InputList」の横要素数を一致させてください")
+        Stop
+        End
+    End If
+    
+    '引数のデフォルト値設定
+    If FolderPath = "" Then
+        FolderPath = ThisWorkbook.Path
+    End If
+    
+    If FileName = "" Then
+        FileName = Title
+    End If
+    
     Dim I&, J&, K&, M&, N& '数え上げ用(Long型)
-    Dim Dummy&
-    M = UBound(TableList, 1)
-    On Error Resume Next
-    Dummy = UBound(TableList, 2)
-    On Error GoTo 0
-    If Dummy <> 0 Then
-        MsgBox ("項目リスト「TableList」は1次元配列で入力してください")
-        Stop
-        End
-    End If
-    
-    On Error Resume Next
-    Dummy = 0
-    Dummy = UBound(InputList, 2)
-    On Error GoTo 0
-    If Dummy = 0 Then
-        MsgBox ("値リスト「InputList」は2次元配列で入力してください")
-        Stop
-        End
-    End If
-    
-    If UBound(TableList, 1) <> UBound(InputList, 2) Then
-        MsgBox ("項目リスト「TableList」の要素数と" & vbLf & _
-                "値リスト「InputList」の2次元要素数を一致させてください")
-        Stop
-        End
-    End If
-    
     N = UBound(InputList, 1)
-    
+    M = UBound(InputList, 2)
     
     Dim XMLDoc As New MSXML2.DOMDocument60
     Dim xmlRoot As IXMLDOMNode
@@ -1072,14 +1009,14 @@ Sub OutputXML(Title$, TableList, InputList, FolderPath$, FileName$)
         For I = 1 To N
             
             '要素を生成
-            Set xmlData = .createElement("DATA")           '要素を生成
-            Set xmlAttr = .createAttribute("id")          'id属性を生成
-            xmlAttr.NodeValue = I                         'id属性の値を設定
-            Call xmlData.Attributes.setNamedItem(xmlAttr) '要素にid属性を設定
+            Set xmlData = .createElement(YokoTableName)      '横要素を生成
+            Set xmlAttr = .createAttribute(TateTableName)    '縦要素を生成
+            xmlAttr.NodeValue = TateTableList(I)             '横要素の値を設定
+            Call xmlData.Attributes.setNamedItem(xmlAttr)    '要素にid属性を設定
             
             '要素の子要素を生成して要素に追加
             For J = 1 To M
-                Set xmlChildData = xmlData.appendChild(.createElement(TableList(J)))
+                Set xmlChildData = xmlData.appendChild(.createElement(YokoTableList(J)))
                 xmlChildData.Text = InputList(I, J)
             Next J
             
@@ -1091,3 +1028,124 @@ Sub OutputXML(Title$, TableList, InputList, FolderPath$, FileName$)
     End With
 
 End Sub
+
+Private Sub CheckArray1D(InputArray, Optional HairetuName$ = "配列")
+'入力配列が1次元配列かどうかチェックする
+'20210804
+
+    Dim Dummy%
+    On Error Resume Next
+    Dummy = UBound(InputArray, 2)
+    On Error GoTo 0
+    If Dummy <> 0 Then
+        MsgBox (HairetuName & "は1次元配列を入力してください")
+        Stop
+        Exit Sub '入力元のプロシージャを確認するために抜ける
+    End If
+
+End Sub
+
+Private Sub CheckArray2D(InputArray, Optional HairetuName$ = "配列")
+'入力配列が2次元配列かどうかチェックする
+'20210804
+
+    Dim Dummy2%, Dummy3%
+    On Error Resume Next
+    Dummy2 = UBound(InputArray, 2)
+    Dummy3 = UBound(InputArray, 3)
+    On Error GoTo 0
+    If Dummy2 = 0 Or Dummy3 <> 0 Then
+        MsgBox (HairetuName & "は2次元配列を入力してください")
+        Stop
+        Exit Sub '入力元のプロシージャを確認するために抜ける
+    End If
+
+End Sub
+
+Private Sub CheckArray1DStart1(InputArray, Optional HairetuName$ = "配列")
+'入力1次元配列の開始番号が1かどうかチェックする
+'20210804
+
+    If LBound(InputArray, 1) <> 1 Then
+        MsgBox (HairetuName & "の開始要素番号は1にしてください")
+        Stop
+        Exit Sub '入力元のプロシージャを確認するために抜ける
+    End If
+
+End Sub
+
+Private Sub CheckArray2DStart1(InputArray, Optional HairetuName$ = "配列")
+'入力2次元配列の開始番号が1かどうかチェックする
+'20210804
+
+    If LBound(InputArray, 1) <> 1 Or LBound(InputArray, 2) <> 1 Then
+        MsgBox (HairetuName & "の開始要素番号は1にしてください")
+        Stop
+        Exit Sub '入力元のプロシージャを確認するために抜ける
+    End If
+
+End Sub
+
+Function GetFileName$(FilePath$)
+'ファイルのフルパスからファイル名取得
+'関数思い出し用
+'20210824
+    
+    Dim Output$
+    Dim TmpList
+    TmpList = Split(FilePath, "\")
+    Output = TmpList(UBound(TmpList))
+    GetFileName = Output
+    
+End Function
+
+Private Function Lib入力配列を処理用に変換(InputHairetu)
+'入力した配列を処理用に変換する
+'1次元配列→2次元配列
+'数値か文字列→2次元配列(1,1)
+'要素の開始番号を1にする
+'20210721
+
+    Dim Output
+    Dim I%, J%, K%, M%, N% '数え上げ用(Integer型)
+    Dim Base1%, Base2%
+    If IsArray(InputHairetu) = False Then
+        '配列でない場合(数値か文字列)
+        ReDim Output(1 To 1, 1 To 1)
+        Output(1, 1) = InputHairetu
+    Else
+        On Error Resume Next
+        M = UBound(InputHairetu, 2)
+        On Error GoTo 0
+        If M = 0 Then
+            '1次元配列
+            Output = WorksheetFunction.Transpose(InputHairetu)
+        Else
+            '2次元配列
+            Base1 = LBound(InputHairetu, 1)
+            Base2 = LBound(InputHairetu, 2)
+            
+            If Base1 <> 1 Or Base2 <> 1 Then
+                N = UBound(InputHairetu, 1)
+                If N = Base1 Then
+                    '(1,M)配列
+                    ReDim Output(1 To 1, 1 To M - Base2 + 1)
+                    For I = 1 To M - Base2 + 1
+                        Output(1, I) = InputHairetu(Base1, Base2 + I - 1)
+                    Next I
+                Else
+                    Output = WorksheetFunction.Transpose(InputHairetu)
+                    Output = WorksheetFunction.Transpose(Output)
+                End If
+            Else
+                Output = InputHairetu
+            End If
+        End If
+    End If
+    
+    Lib入力配列を処理用に変換 = Output
+    
+End Function
+
+
+
